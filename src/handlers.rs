@@ -7,6 +7,8 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::db;
+
 pub async fn fallback(uri: Uri) -> impl IntoResponse {
     println!("-> fallback // {uri}");
 
@@ -42,8 +44,15 @@ pub async fn handle_post(Json(mut payload): Json<UserPayload>) -> Json<UserPaylo
     Json(payload)
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize)]
 pub struct UserPayload {
     user: String,
     age: u8,
+}
+
+pub async fn handle_get_records() -> String {
+    println!("-> handle_get_records");
+
+    let records = db::fetch_all_records().await;
+    format!("{records:#?}")
 }

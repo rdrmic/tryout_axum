@@ -1,11 +1,10 @@
+mod db;
 mod handlers;
 mod router;
 
-use router::create_router;
-
 #[tokio::main]
 async fn main() {
-    let router = create_router();
+    let router = router::create_router();
 
     // run our app with hyper, listening globally on port 3000
     let tcp_listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
