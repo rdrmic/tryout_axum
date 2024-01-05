@@ -1,26 +1,23 @@
-use sqlx::{postgres::PgPoolOptions, query_as, FromRow, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, query_as, Pool, Postgres};
 
-#[derive(Debug, FromRow, Clone)]
-pub struct PwsAlertLevel {
-    pub id: i64,
-    pub cmas_level: String,
-    pub eu_alert_level: String,
-}
+use crate::data_model::Item;
 
-pub async fn fetch_all_records() -> Vec<PwsAlertLevel> {
-    let db_connection_pool = create_db_connection_pool().await;
-
-    query_as::<_, PwsAlertLevel>("SELECT * FROM cbc.pws_alert_level")
+pub async fn fetch_all(db_connection_pool: Pool<Postgres>) -> Vec<Item> {
+    query_as!(Item, "SELECT * FROM item")
         .fetch_all(&db_connection_pool)
         .await
-        .expect("Failed to fetch records from cbc.pws_alert_level")
+        .unwrap()
 }
 
-async fn create_db_connection_pool() -> Pool<Postgres> {
+pub async fn create_db_connection_pool(
+    url: &str,
+    min_connections: u32,
+    max_connections: u32,
+) -> Pool<Postgres> {
     PgPoolOptions::new()
-        .min_connections(1)
-        .max_connections(1)
-        .connect("postgres://postgres:postgres@localhost:5432/cbc_db")
+        .min_connections(min_connections)
+        .max_connections(max_connections)
+        .connect(url)
         .await
         .expect("Couldn't connect to the database")
 }

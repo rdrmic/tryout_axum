@@ -1,10 +1,11 @@
 use axum::{
-    extract::{Path, Query},
+    extract::{Path, Query, State},
     http::{HeaderMap, Method, StatusCode, Uri},
     response::{Html, IntoResponse},
     Json,
 };
 use serde::{Deserialize, Serialize};
+use sqlx::{Pool, Postgres};
 use std::collections::HashMap;
 
 use crate::db;
@@ -50,9 +51,14 @@ pub struct UserPayload {
     age: u8,
 }
 
-pub async fn handle_get_records() -> String {
-    println!("-> handle_get_records");
+//tokio::sync::Mutex
 
-    let records = db::fetch_all_records().await;
+pub async fn fetch_all(State(db_connection_pool): State<Pool<Postgres>>) -> String {
+    println!("-> fetch_all");
+
+    //let db_connection = db_connection_pool.acquire().await.unwrap();
+    //let db_connection = db_connection_pool.begin().await.unwrap();
+
+    let records = db::fetch_all(db_connection_pool).await;
     format!("{records:#?}")
 }
