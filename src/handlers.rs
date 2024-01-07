@@ -5,7 +5,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Postgres};
+use sqlx::PgPool;
 use std::collections::HashMap;
 
 use crate::db;
@@ -51,14 +51,39 @@ pub struct UserPayload {
     age: u8,
 }
 
-//tokio::sync::Mutex
+// TODO tokio::sync::Mutex
 
-pub async fn fetch_all(State(db_connection_pool): State<Pool<Postgres>>) -> String {
+pub async fn fetch_all(State(db_connection_pool): State<PgPool>) -> String {
     println!("-> fetch_all");
-
-    //let db_connection = db_connection_pool.acquire().await.unwrap();
-    //let db_connection = db_connection_pool.begin().await.unwrap();
 
     let records = db::fetch_all(db_connection_pool).await;
     format!("{records:#?}")
+}
+
+pub async fn find_by_id(State(db_connection_pool): State<PgPool>) -> String {
+    println!("-> find_by_id");
+
+    let record = db::find_by_id(db_connection_pool).await;
+    format!("{record:#?}")
+}
+
+pub async fn insert(State(db_connection_pool): State<PgPool>) -> String {
+    println!("-> insert");
+
+    let inserted_record = db::insert(db_connection_pool).await;
+    format!("{inserted_record:#?}")
+}
+
+pub async fn update(State(db_connection_pool): State<PgPool>) -> String {
+    println!("-> update");
+
+    let updated_record = db::update(db_connection_pool).await;
+    format!("{updated_record:#?}")
+}
+
+pub async fn delete_by_id(State(db_connection_pool): State<PgPool>) -> String {
+    println!("-> delete_by_id");
+
+    let deleted_record = db::delete_by_id(db_connection_pool).await;
+    format!("deleted: {}", deleted_record.is_some())
 }

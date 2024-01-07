@@ -1,6 +1,6 @@
 use sqlx::types::time::PrimitiveDateTime;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Item {
     pub id: i64,
     pub name: String,
